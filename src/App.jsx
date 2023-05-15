@@ -101,13 +101,13 @@ function App() {
             </Typography.Title>
             <Space direction={'vertical'} size={'large'}>
               {
-                showHint || !state.progress &&
+                showHint || !(state.question.original && state.question.original.score) &&
                 <Typography.Text>
                   {JSON.stringify(state.question.original)}
                 </Typography.Text>
               }
               {
-                !showHint && state.progress &&
+                !showHint && !!(state.question.original && state.question.original.score) &&
                 <Button onClick={toggleHint} size={'small'} type={'text'}>Show hint</Button>
               }
               <Space align={'center'} wrap>
