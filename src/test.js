@@ -632,7 +632,7 @@ var Quiz = (function () {
       if (!this._answerPossiblyRemembered()) {
         switch (this._currentMode) {
           case 0:
-            message = this._currentQuestion.getDescription()
+            message = `${this._currentQuestion.getDescription()} (русский)`
             break
           case 1:
             message = this._currentQuestion.getLetter()

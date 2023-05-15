@@ -101,7 +101,7 @@ function App() {
             </Typography.Title>
             <Space direction={'vertical'} size={'large'}>
               {
-                showHint &&
+                showHint || !state.progress &&
                 <Typography.Text>
                   {JSON.stringify(state.question.original)}
                 </Typography.Text>

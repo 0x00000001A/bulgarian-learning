@@ -1,5 +1,5 @@
 {
-  "name": "bgn",
+  "name": "hiragana",
   "groups": [
     [
       { "letter": "аз", "description": "я" },
@@ -10,6 +10,13 @@
       { "letter": "ние", "description": "мы" },
       { "letter": "вие", "description": "вы" },
       { "letter": "те", "description": "они" }
+    ],
+    [
+      { "letter": "съм", "description": "аз" },
+      { "letter": "си", "description": "ти" },
+      { "letter": "сме", "description": "ние" },
+      { "letter": "сте", "description": "вие" },
+      { "letter": "са", "description": "те" }
     ]
   ]
 }
