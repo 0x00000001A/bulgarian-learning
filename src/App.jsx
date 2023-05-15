@@ -107,7 +107,7 @@ function App() {
                 </Typography.Text>
               }
               {
-                !showHint &&
+                !showHint && state.progress &&
                 <Button onClick={toggleHint} size={'small'} type={'text'}>Show hint</Button>
               }
               <Space align={'center'} wrap>
