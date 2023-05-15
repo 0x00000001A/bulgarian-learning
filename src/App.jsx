@@ -67,7 +67,7 @@ function App() {
   
   const handleManualAnswer = useCallback((values) => {
     answer({
-      text: values.answer
+      text: values.answer.toLowerCase()
     })
     form.resetFields()
   }, [answer, form])
@@ -79,6 +79,13 @@ function App() {
   const isOptionsMode = useMemo(() => {
     return !!state.options.length
   }, [state])
+  
+  const resetProgress = useCallback(() => {
+    if (confirm('Sure?')) {
+      localStorage.removeItem('al-bulgarian')
+      window.location.reload()
+    }
+  }, [])
   
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(loadLanguages, [])
@@ -103,18 +110,18 @@ function App() {
                 !showHint &&
                 <Button onClick={toggleHint} size={'small'} type={'text'}>Show hint</Button>
               }
-              <Space align={'center'}>
+              <Space align={'center'} wrap>
                 {
                   isOptionsMode &&
                   state.options.map((option) => (
-                    <Button key={option.text} onClick={() => answer(option)} disabled={answerStatus}>
+                    <Button key={option.text} onClick={() => answer(option)} disabled={answerStatus} size={'large'}>
                       {option.text}
                     </Button>
                   ))
                 }
                 {
                   !isOptionsMode &&
-                  <Form onFinish={handleManualAnswer} autoComplete={'off'} disabled={answerStatus}>
+                  <Form onFinish={handleManualAnswer} autoComplete={'off'} disabled={answerStatus} size={'large'}>
                     <Form.Item name={'answer'} rules={[{required: true, message: 'Please input your answer!'}]}>
                       <Space.Compact style={{width: '100%'}}>
                         <Input placeholder={'Answer here'}/>
@@ -134,6 +141,7 @@ function App() {
                 answerStatus === ANSWER_STATUSES.SUCC &&
                 <Typography.Text type={'success'}>Correct!</Typography.Text>
               }
+              <Button onClick={resetProgress} size={'small'} type={'text'}>Reset progress</Button>
             </Space>
           </center>
         </Card>

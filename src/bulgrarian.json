@@ -2,165 +2,21 @@
   "name": "hiragana",
   "groups": [
     [
-      { "letter": "あ", "description": "a" },
-      { "letter": "い", "description": "i" },
-      { "letter": "う", "description": "u" },
-      { "letter": "え", "description": "e" },
-      { "letter": "お", "description": "o" }
+      { "letter": "аз", "description": "я" },
+      { "letter": "ти", "description": "ты" },
+      { "letter": "той", "description": "он" },
+      { "letter": "тя", "description": "она" },
+      { "letter": "то", "description": "оно" },
+      { "letter": "ние", "description": "мы" },
+      { "letter": "вие", "description": "вы" },
+      { "letter": "те", "description": "они" }
     ],
     [
-      { "letter": "か", "description": "ka" },
-      { "letter": "き", "description": "ki" },
-      { "letter": "く", "description": "ku" },
-      { "letter": "け", "description": "ke" },
-      { "letter": "こ", "description": "ko" }
-    ],
-    [
-      { "letter": "さ", "description": "sa" },
-      { "letter": "し", "description": "shi" },
-      { "letter": "す", "description": "su" },
-      { "letter": "せ", "description": "se" },
-      { "letter": "そ", "description": "so" }
-    ],
-    [
-      { "letter": "た", "description": "ta" },
-      { "letter": "ち", "description": "chi" },
-      { "letter": "つ", "description": "tsu" },
-      { "letter": "て", "description": "te" },
-      { "letter": "と", "description": "to" }
-    ],
-    [
-      { "letter": "な", "description": "na" },
-      { "letter": "に", "description": "ni" },
-      { "letter": "ぬ", "description": "nu" },
-      { "letter": "ね", "description": "ne" },
-      { "letter": "の", "description": "no" }
-    ],
-    [
-      { "letter": "は", "description": "ha" },
-      { "letter": "ひ", "description": "hi" },
-      { "letter": "ふ", "description": "fu" },
-      { "letter": "へ", "description": "he" },
-      { "letter": "ほ", "description": "ho" }
-    ],
-    [
-      { "letter": "ま", "description": "ma" },
-      { "letter": "み", "description": "mi" },
-      { "letter": "む", "description": "mu" },
-      { "letter": "め", "description": "me" },
-      { "letter": "も", "description": "mo" }
-    ],
-    [
-      { "letter": "や", "description": "ya" },
-      { "letter": "ゆ", "description": "yu" },
-      { "letter": "よ", "description": "yo" }
-    ],
-    [
-      { "letter": "ら", "description": "ra" },
-      { "letter": "り", "description": "ri" },
-      { "letter": "る", "description": "ru" },
-      { "letter": "れ", "description": "re" },
-      { "letter": "ろ", "description": "ro" }
-    ],
-    [
-      { "letter": "わ", "description": "wa" },
-      { "letter": "を", "description": "wo" },
-      { "letter": "ん", "description": "n" }
-    ],
-    [
-      { "letter": "が", "description": "ga" },
-      { "letter": "ぎ", "description": "gi" },
-      { "letter": "ぐ", "description": "gu" },
-      { "letter": "げ", "description": "ge" },
-      { "letter": "ご", "description": "go" }
-    ],
-    [
-      { "letter": "ざ", "description": "za" },
-      { "letter": "じ", "description": "ji" },
-      { "letter": "ず", "description": "zu" },
-      { "letter": "ぜ", "description": "ze" },
-      { "letter": "ぞ", "description": "zo" }
-    ],
-    [
-      { "letter": "だ", "description": "da" },
-      { "letter": "ぢ", "description": "ji" },
-      { "letter": "づ", "description": "zu" },
-      { "letter": "で", "description": "de" },
-      { "letter": "ど", "description": "do" }
-    ],
-    [
-      { "letter": "ば", "description": "ba" },
-      { "letter": "び", "description": "bi" },
-      { "letter": "ぶ", "description": "bu" },
-      { "letter": "べ", "description": "be" },
-      { "letter": "ぼ", "description": "bo" }
-    ],
-    [
-      { "letter": "ぱ", "description": "pa" },
-      { "letter": "ぴ", "description": "pi" },
-      { "letter": "ぷ", "description": "pu" },
-      { "letter": "ぺ", "description": "pe" },
-      { "letter": "ぽ", "description": "po" }
-    ],
-    [
-      { "letter": "きゃ", "description": "kya" },
-      { "letter": "きゅ", "description": "kyu" },
-      { "letter": "きょ", "description": "kyo" }
-    ],
-    [
-      { "letter": "さは", "description": "sha" },
-      { "letter": "しゅ", "description": "shu" },
-      { "letter": "しょ", "description": "sho" }
-    ],
-    [
-      { "letter": "ちゃ", "description": "cha" },
-      { "letter": "ちゅ", "description": "chu" },
-      { "letter": "ちょ", "description": "cho" }
-    ],
-    [
-      { "letter": "にゃ", "description": "nya" },
-      { "letter": "にゅ", "description": "nyu" },
-      { "letter": "にょ", "description": "nyo" }
-    ],
-    [
-      { "letter": "ひゃ", "description": "hya" },
-      { "letter": "ひゅ", "description": "hyu" },
-      { "letter": "ひょ", "description": "hyo" }
-    ],
-    [
-      { "letter": "みゃ", "description": "mya" },
-      { "letter": "みゅ", "description": "myu" },
-      { "letter": "みょ", "description": "myo" }
-    ],
-    [
-      { "letter": "りゃ", "description": "rya" },
-      { "letter": "りゅ", "description": "ryu" },
-      { "letter": "りょ", "description": "ryo" }
-    ],
-    [
-      { "letter": "ぎゃ", "description": "gya" },
-      { "letter": "ぎゅ", "description": "gyu" },
-      { "letter": "ぎょ", "description": "gyo" }
-    ],
-    [
-      { "letter": "じゃ", "description": "zya", "transcription": "(d)ʑa" },
-      { "letter": "じゅ", "description": "zyu", "transcription": "(d)ʑɯ" },
-      { "letter": "じょ", "description": "zyo", "transcription": "(d)ʑo" }
-    ],
-    [
-      { "letter": "づゃ", "description": "d(z)ya", "transcription": "(d)ʑa" },
-      { "letter": "づゅ", "description": "d(z)yu", "transcription": "(d)ʑɯ" },
-      { "letter": "づょ", "description": "d(z)yo", "transcription": "(d)ʑo" }
-    ],
-    [
-      { "letter": "びゃ", "description": "bya" },
-      { "letter": "びゅ", "description": "byu" },
-      { "letter": "びょ", "description": "byo" }
-    ],
-    [
-      { "letter": "ぴゃ", "description": "pya" },
-      { "letter": "ぴゅ", "description": "pyu" },
-      { "letter": "ぴょ", "description": "pyo" }
+      { "letter": "съм", "description": "аз" },
+      { "letter": "си", "description": "ти" },
+      { "letter": "сме", "description": "ние" },
+      { "letter": "сте", "description": "вие" },
+      { "letter": "са", "description": "те" }
     ]
   ]
 }
