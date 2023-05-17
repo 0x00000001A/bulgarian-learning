@@ -1,5 +1,4 @@
-import {Button, Card, Form, Input, Progress, Space, Typography} from 'antd'
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import {ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState} from 'react'
 import Quiz from './lib/AlphabetQuiz'
 
 import bulgarian from './bulgrarian.json'
@@ -13,13 +12,9 @@ const ANSWER_STATUSES = {
   SUCC: 2
 }
 
-type FormInitial = {
-  answer: string
-}
-
 function App() {
-  const [form] = Form.useForm()
   const [showHint, setShowHint] = useState(false)
+  const [textAnswer, setTextAnswer] = useState('')
   const [answerStatus, setAnswerStatus] = useState(ANSWER_STATUSES.NONE)
   
   const [question, setQuestion] = useState<QuizQuestion>({
@@ -52,22 +47,25 @@ function App() {
     }
     
     setTimeout(() => {
+      setTextAnswer('')
       setShowHint(false)
       quiz.next(option.text)
       setQuestion(quiz.getQuestion())
-      
       localStorage.setItem('al-bulgarian', JSON.stringify(quiz.getSnapshot()))
-      
       setAnswerStatus(ANSWER_STATUSES.NONE)
     }, 1000)
   }, [])
   
-  const handleManualAnswer = useCallback((values: FormInitial) => {
+  const handleManualAnswer = useCallback((event: FormEvent) => {
+    event.preventDefault()
     answer({
-      text: values.answer.toLowerCase()
+      text: textAnswer.trim().toLowerCase()
     })
-    form.resetFields()
-  }, [answer, form])
+  }, [answer, textAnswer])
+  
+  const handleTextAnswerChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setTextAnswer(event.target.value)
+  }, [])
   
   const toggleHint = useCallback(() => {
     setShowHint(!showHint)
@@ -88,71 +86,69 @@ function App() {
   useEffect(loadLanguages, [])
   
   return (
-    <Card bordered={false} className={'quizCard'}>
-      <Progress style={{margin: 0}} percent={question.progress} showInfo={false} size={'small'}/>
-      <Typography.Text type={'secondary'}>Раздел: {question.group}</Typography.Text>
-      <Typography.Title style={{margin: '0.5em 0'}}>
+    <div className={'quizCard'}>
+      <div className={'quizProgress'}>
+        <div className={'quizProgressInner'} style={{width: `${question.progress}%`}}></div>
+      </div>
+      <span className={'quizTextSmall quizTextSecondary'}>Раздел: {question.group}</span>
+      <span className={'quizQuestion'}>
         {question.text}
-      </Typography.Title>
-      <Space direction={'vertical'} size={'large'}>
+      </span>
+      <div>
         {
-          showHint
-            ? (
-              <Typography.Text type={'danger'} strong>
-                {question.hint}
-              </Typography.Text>
-            )
-            : (
-              <>
-                {
-                  answerStatus === ANSWER_STATUSES.NONE &&
-                  <Button onClick={toggleHint} size={'small'} type={'text'}>Show hint</Button>
-                }
-                {
-                  answerStatus === ANSWER_STATUSES.FAIL &&
-                  <Typography.Text type={'danger'}>Wrong answer!</Typography.Text>
-                }
-                {
-                  answerStatus === ANSWER_STATUSES.SUCC &&
-                  <Typography.Text type={'success'}>Correct!</Typography.Text>
-                }
-              </>
-            )
+          showHint && !answerStatus &&
+          <span className={'quizHint quizTextDanger quizTextBold'}>
+            {question.hint}
+          </span>
         }
-        <Space align={'center'} className={'quizOptions'} wrap>
-          {
-            isOptionsMode &&
-            question.options.map((option, optionIndex) => (
-              <Button key={`${option.text}${optionIndex}`} onClick={() => answer(option)} disabled={!!answerStatus}
-                      size={'large'}>
-                {option.text}
-              </Button>
-            ))
-          }
-          {
-            !isOptionsMode &&
-            <Form
-              form={form}
-              initialValues={{answer: ''}}
-              onFinish={handleManualAnswer}
-              autoComplete={'off'}
+        {
+          !showHint && answerStatus === ANSWER_STATUSES.NONE &&
+          <button className={'quizButton quizButtonSmall quizTextSecondary'} onClick={toggleHint}>
+            Show hint
+          </button>
+        }
+        {
+          answerStatus === ANSWER_STATUSES.FAIL &&
+          <span className={'quizHint quizTextDanger'}>
+            Wrong answer!
+          </span>
+        }
+        {
+          answerStatus === ANSWER_STATUSES.SUCC &&
+          <span className={'quizHint quizTextSuccess'}>
+            Correct!
+          </span>
+        }
+      </div>
+      <div className={'quizOptions'}>
+        {
+          isOptionsMode &&
+          question.options.map((option, optionIndex) => (
+            <button
+              key={optionIndex}
+              className={'quizButton'}
+              onClick={() => answer(option)}
               disabled={!!answerStatus}
-              size={'large'}
             >
-              <Form.Item name={'answer'} rules={[{required: true, message: 'Please input your answer!'}]}>
-                <Space.Compact style={{width: '100%'}}>
-                  <Input autoFocus placeholder={'Answer here'}/>
-                  <Button type={'primary'} htmlType={'submit'}>
-                    Submit
-                  </Button>
-                </Space.Compact>
-              </Form.Item>
-            </Form>
-          }
-        </Space>
-        <Button onClick={resetProgress} size={'small'} type={'text'}>Reset progress</Button>
-      </Space>
-    </Card>
+              {option.text}
+            </button>
+          ))
+        }
+        {
+          !isOptionsMode &&
+          <form className={'quizForm'} onSubmit={handleManualAnswer} autoComplete={'off'}>
+            <input onChange={handleTextAnswerChange} className={'quizInputText'} type={'text'}
+                   placeholder={'Answer here'} autoFocus/>
+            <button className={'quizButton'} type={'submit'}>
+              Submit
+            </button>
+          </form>
+        }
+      </div>
+      <button className={'quizButton quizButtonSmall quizTextSecondary'} onClick={resetProgress}>
+        Reset progress
+      </button>
+    </div>
   )
 }
 
