@@ -2,7 +2,7 @@ import {ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState} from 
 import Quiz from './lib/AlphabetQuiz'
 
 import bulgarian from './bulgrarian.json'
-import {QuizOption, QuizQuestion} from './lib/types.ts'
+import {QuizQuestion} from './lib/types.ts'
 
 const quiz = new Quiz()
 
@@ -39,8 +39,8 @@ function App() {
     setQuestion(quiz.getQuestion())
   }, [])
   
-  const answer = useCallback((option: QuizOption) => {
-    if (!quiz.isCorrect(option.text)) {
+  const answer = useCallback((option: string) => {
+    if (!quiz.isCorrect(option)) {
       setAnswerStatus(ANSWER_STATUSES.FAIL)
     } else {
       setAnswerStatus(ANSWER_STATUSES.SUCC)
@@ -49,7 +49,7 @@ function App() {
     setTimeout(() => {
       setTextAnswer('')
       setShowHint(false)
-      quiz.next(option.text)
+      quiz.next(option)
       setQuestion(quiz.getQuestion())
       localStorage.setItem('al-bulgarian', JSON.stringify(quiz.getSnapshot()))
       setAnswerStatus(ANSWER_STATUSES.NONE)
@@ -58,9 +58,7 @@ function App() {
   
   const handleManualAnswer = useCallback((event: FormEvent) => {
     event.preventDefault()
-    answer({
-      text: textAnswer.trim().toLowerCase()
-    })
+    answer(textAnswer.trim().toLowerCase())
   }, [answer, textAnswer])
   
   const handleTextAnswerChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -123,11 +121,11 @@ function App() {
       <div className={'quizOptions'}>
         {
           isOptionsMode &&
-          question.options.map((option, optionIndex) => (
+          question.options.map((option) => (
             <button
-              key={optionIndex}
+              key={option.id}
               className={'quizButton'}
-              onClick={() => answer(option)}
+              onClick={() => answer(option.text)}
               disabled={!!answerStatus}
             >
               {option.text}
@@ -137,8 +135,13 @@ function App() {
         {
           !isOptionsMode &&
           <form className={'quizForm'} onSubmit={handleManualAnswer} autoComplete={'off'}>
-            <input onChange={handleTextAnswerChange} className={'quizInputText'} type={'text'}
-                   placeholder={'Answer here'} autoFocus/>
+            <input
+              onChange={handleTextAnswerChange}
+              className={'quizInputText'}
+              type={'text'}
+              placeholder={'Answer here'}
+              autoFocus
+            />
             <button className={'quizButton'} type={'submit'}>
               Submit
             </button>

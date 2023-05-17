@@ -23,6 +23,7 @@ export enum QuizModes {
 }
 
 export type QuizOption = {
+  id: string
   text: string
 }
 

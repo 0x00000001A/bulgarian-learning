@@ -70,6 +70,12 @@ class AlphabetQuiz {
     return letter === answerFixed || description === answerFixed
   }
   
+  getUniqueId() {
+    const dateString = Date.now().toString(36)
+    const randomness = Math.random().toString(36).substring(2)
+    return dateString + randomness
+  }
+  
   getOptions(): QuizOption[] {
     const options: QuizOption[] = []
     
@@ -77,6 +83,7 @@ class AlphabetQuiz {
     if (this.currentMode < QuizModes.BIDERECTIONAL_QUESTIONS_WITH_MANUAL_INPUT) {
       this.currentGroup.letters.forEach((letter) => {
         const option: QuizOption = {
+          id: this.getUniqueId(),
           text: letter.letter
         }
         
@@ -91,43 +98,6 @@ class AlphabetQuiz {
     shuffleArray(options)
     
     return options
-  }
-  
-  getGroup() {
-    return this.currentGroup
-  }
-  
-  getMessage() {
-    let message = ''
-    
-    if (!this.answerPossiblyRemembered()) {
-      switch (this.currentMode) {
-        case 0:
-          message = this.currentQuestion.description
-          break
-        case 1:
-          message = this.currentQuestion.letter
-          break
-      }
-    } else {
-      switch (this.currentMode) {
-        case 0: // Letter as question with options
-        case 1: // Description as question with options
-          message = 'Select one option'
-          break
-        case 2: // Letter as question with free-type answer
-          message = 'Type your answer and press Enter'
-          break
-        default:
-        // unknown mode;
-      }
-    }
-    
-    return message
-  }
-  
-  getSentence() {
-    return this.currentQuestion.sentence
   }
   
   getQuestion(): QuizQuestion {
@@ -175,12 +145,6 @@ class AlphabetQuiz {
     const percentage = progress / total * 100
     
     return isNaN(percentage) ? 0 : percentage
-  }
-  
-  setMinScoreToRememember(val: number) {
-    if (val > 0) {
-      this.MIN_SCORE_TO_REMEMBER = val
-    }
   }
   
   getSnapshot(): QuizSnapshot {
@@ -266,7 +230,7 @@ class AlphabetQuiz {
     }
     
     shuffleArray(groups)
-
+    
     this.currentGroup = groups.shift() || this.currentGroup
     
     const restGroupsSize = groups.length
