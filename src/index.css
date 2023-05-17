@@ -120,22 +120,28 @@ html, body {
 }
 
 .quizForm {
-    border: 1px solid #dedede;
     border-radius: 4px;
-}
-
-.quizForm:has(.quizInputText:focus) {
-    border: 1px solid #1677ff;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
 }
 
 .quizForm .quizInputText {
     border-radius: 4px 0 0 4px;
-    border: 0;
 }
 
 .quizForm .quizButton {
     border-radius: 0 4px 4px 0;
-    border-width: 0 0 0 1px;
+    color: #fff;
+    background-color: #1677ff;
+    border-color: #1677ff;
+}
+
+.quizForm .quizButton:hover,
+.quizForm .quizButton:active {
+    color: #1677ff;
+    background-color: #fff;
+    border-color: #1677ff;
 }
 
 .quizTextSmall {
