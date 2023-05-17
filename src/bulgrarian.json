@@ -1,23 +1,29 @@
 {
   "name": "bgn",
   "groups": [
-    [
-      {"letter": "аз", "description": "я"},
-      {"letter": "ти", "description": "ты"},
-      {"letter": "той", "description": "он"},
-      {"letter": "тя", "description": "она"},
-      {"letter": "то", "description": "оно"},
-      {"letter": "ние", "description": "мы"},
-      {"letter": "вие", "description": "вы"},
-      {"letter": "те", "description": "они"}
-    ],
-    [
-      {"letter": "е", "description": "той, тя, то", "manual": false},
-      {"letter": "са", "description": "те"},
-      {"letter": "си", "description": "ти"},
-      {"letter": "сте", "description": "вие"},
-      {"letter": "съм", "description": "аз"},
-      {"letter": "сме", "description": "ние"}
-    ]
+    {
+      "description": "Местоимения",
+      "letters": [
+        {"letter": "аз", "description": "я"},
+        {"letter": "ти", "description": "ты"},
+        {"letter": "той", "description": "он"},
+        {"letter": "тя", "description": "она"},
+        {"letter": "то", "description": "оно"},
+        {"letter": "ние", "description": "мы"},
+        {"letter": "вие", "description": "вы"},
+        {"letter": "те", "description": "они"}
+      ]
+    },
+    {
+      "description": "Артикли",
+      "letters": [
+        {"letter": "е", "description": "той, тя, то", "manual": false},
+        {"letter": "са", "description": "те", "manual": false},
+        {"letter": "си", "description": "ти", "manual": false},
+        {"letter": "сте", "description": "вие", "manual": false},
+        {"letter": "съм", "description": "аз", "manual": false},
+        {"letter": "сме", "description": "ние", "manual": false}
+      ]
+    }
   ]
 }

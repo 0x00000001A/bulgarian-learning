@@ -1,4 +1,4 @@
-import {AlphabetLetterObject, AlphabetObject} from './types.ts'
+import {AlphabetGroupObject, AlphabetObject} from './types.ts'
 import AlphabetLetterGroup from './AlphabetLetterGroup.ts'
 
 class Alphabet {
@@ -22,7 +22,7 @@ class Alphabet {
     const groups = []
     
     for (let i = 0; i < this.groupsCount; i++) {
-      groups.push(this.getGroup(i).toArray())
+      groups.push(this.getGroup(i).toObject())
     }
     
     return {
@@ -31,12 +31,12 @@ class Alphabet {
     }
   }
   
-  addGroup(index: number, letters: AlphabetLetterObject[]) {
-    this.groups[index] = new AlphabetLetterGroup(index, letters)
+  addGroup(index: number, group: AlphabetGroupObject) {
+    this.groups[index] = new AlphabetLetterGroup(index, group)
     this.groupsCount++
   }
   
-  initGroups(groups: AlphabetLetterObject[][]) {
+  initGroups(groups: AlphabetGroupObject[]) {
     const groupsCount = groups.length
     
     for (let i = 0; i < groupsCount; i++) {

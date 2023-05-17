@@ -6,9 +6,14 @@ export type AlphabetLetterObject = {
   sentence?: string
 }
 
+export type AlphabetGroupObject = {
+  description: string,
+  letters: AlphabetLetterObject[]
+}
+
 export type AlphabetObject = {
   name: string
-  groups: AlphabetLetterObject[][]
+  groups: AlphabetGroupObject[]
 }
 
 export enum QuizModes {
@@ -23,7 +28,11 @@ export type QuizOption = {
 
 export type QuizQuestion = {
   text: string
-  original: AlphabetLetterObject
+  hint: string
+  group: string,
+  score: number,
+  options: QuizOption[]
+  progress: number
   remembered: boolean
 }
 

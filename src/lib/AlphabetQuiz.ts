@@ -1,4 +1,4 @@
-import {QuizModes, AlphabetObject, QuizOption, QuizQuestion, QuizSnapshot} from './types.ts'
+import {AlphabetObject, QuizModes, QuizOption, QuizQuestion, QuizSnapshot} from './types.ts'
 import Alphabet from './Alphabet.ts'
 import AlphabetLetterGroup from './AlphabetLetterGroup.ts'
 import {getRandomUpTo, shuffleArray} from './utils.ts'
@@ -25,13 +25,16 @@ class AlphabetQuiz {
     
     const dummyAlphabet: AlphabetObject = {
       name: '',
-      groups: [[{
-        letter: '',
+      groups: [{
         description: '',
-        manual: false,
-        score: 0,
-        sentence: ''
-      }]]
+        letters: [{
+          letter: '',
+          description: '',
+          manual: false,
+          score: 0,
+          sentence: ''
+        }]
+      }]
     }
     
     this.alphabet = new Alphabet(dummyAlphabet)
@@ -42,10 +45,10 @@ class AlphabetQuiz {
   
   start(alphabet: AlphabetObject) {
     this.initQuestions(alphabet)
-    this.next()
+    this.next(undefined, true)
   }
   
-  next(answerText = '') {
+  next(answerText = '', isCleanRun = true) {
     if (this.currentQuestion) {
       if (this.isCorrect(answerText)) {
         this.currentQuestion.addScore()
@@ -54,7 +57,7 @@ class AlphabetQuiz {
       }
     }
     
-    this.changeGroup()
+    this.changeGroup(isCleanRun)
     this.changeQuestion()
     this.changeMode()
   }
@@ -90,6 +93,10 @@ class AlphabetQuiz {
     return options
   }
   
+  getGroup() {
+    return this.currentGroup
+  }
+  
   getMessage() {
     let message = ''
     
@@ -123,10 +130,14 @@ class AlphabetQuiz {
     return this.currentQuestion.sentence
   }
   
-  getQuestion() {
-    const question: QuizQuestion = {
+  getQuestion(): QuizQuestion {
+    const question = {
       text: '',
-      original: this.currentQuestion.toObject(),
+      hint: '',
+      group: this.currentGroup.description,
+      score: this.currentQuestion.score,
+      options: this.getOptions(),
+      progress: this.getProgress(),
       remembered: this.answerPossiblyRemembered()
     }
     
@@ -134,9 +145,11 @@ class AlphabetQuiz {
       case 0: // Letter with options
       case 2: // Letter and free-type answer
         question.text = this.currentQuestion.letter
+        question.hint = this.currentQuestion.description
         break
       case 1: // Description with options
         question.text = this.currentQuestion.description
+        question.hint = this.currentQuestion.letter
         break
       default:
       // unknown mode;
@@ -198,6 +211,7 @@ class AlphabetQuiz {
   
   initQuestions(alphabet: AlphabetObject) {
     this.alphabet = new Alphabet(alphabet)
+    this.currentGroup = this.alphabet.groups[0]
     this.currentDatabase = new PriorityQueue<AlphabetLetterGroup>(this.alphabet.groupsCount)
     this.currentDatabase.setComparator((groupA, groupB) => {
       let aScore = 0
@@ -230,8 +244,8 @@ class AlphabetQuiz {
     }
   }
   
-  changeGroup() {
-    if (this.currentGroup) {
+  changeGroup(isCleanRun = false) {
+    if (!isCleanRun && this.currentGroup) {
       this.currentDatabase.push(this.currentGroup)
     }
     
@@ -252,12 +266,8 @@ class AlphabetQuiz {
     }
     
     shuffleArray(groups)
-    
-    const nextCurrentGroup = groups.shift()
-    
-    if (nextCurrentGroup) {
-      this.currentGroup = nextCurrentGroup
-    }
+
+    this.currentGroup = groups.shift() || this.currentGroup
     
     const restGroupsSize = groups.length
     
