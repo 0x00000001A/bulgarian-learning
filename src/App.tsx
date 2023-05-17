@@ -1,8 +1,9 @@
 import {Button, Card, Col, Form, Input, Progress, Row, Space, Typography} from 'antd'
 import {useCallback, useEffect, useMemo, useState} from 'react'
-import Quiz from './test.js'
+import Quiz from './lib/AlphabetQuiz'
 
 import bulgarian from './bulgrarian.json'
+import {QuizOption, QuizQuestion} from './lib/types.ts'
 
 const quiz = new Quiz()
 
@@ -12,17 +13,29 @@ const ANSWER_STATUSES = {
   SUCC: 2
 }
 
+type QuizState = {
+  message: string
+  options: QuizOption[]
+  question: QuizQuestion
+  sentence: string
+  progress: number
+}
+
+type FormInitial = {
+  answer: string
+}
+
 function App() {
   const [form] = Form.useForm()
   const [showHint, setShowHint] = useState(false)
   const [answerStatus, setAnswerStatus] = useState(ANSWER_STATUSES.NONE)
   
-  const [state, setState] = useState({
+  const [state, setState] = useState<QuizState>({
     message: '',
     options: [],
-    question: '',
+    question: {} as QuizQuestion,
     sentence: '',
-    progress: ''
+    progress: 0
   })
   
   const loadLanguages = useCallback(() => {
@@ -43,7 +56,7 @@ function App() {
     })
   }, [])
   
-  const answer = useCallback((option) => {
+  const answer = useCallback((option: QuizOption) => {
     if (!quiz.isCorrect(option.text)) {
       setAnswerStatus(ANSWER_STATUSES.FAIL)
     } else {
@@ -65,7 +78,7 @@ function App() {
     }, 1000)
   }, [])
   
-  const handleManualAnswer = useCallback((values) => {
+  const handleManualAnswer = useCallback((values: FormInitial) => {
     answer({
       text: values.answer.toLowerCase()
     })
@@ -90,6 +103,10 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(loadLanguages, [])
   
+  if (!state?.question?.original) {
+    return null
+  }
+  
   return (
     <Row justify={'center'}>
       <Col xs={20} sm={16} md={16} lg={8} xl={6}>
@@ -101,7 +118,7 @@ function App() {
             </Typography.Title>
             <Space direction={'vertical'} size={'large'}>
               {
-                showHint || !(state.question.original && state.question.original.score) &&
+                (showHint || Number(state.question.original.score) <= 0) &&
                 <Typography.Text>
                   {JSON.stringify(state.question.original)}
                 </Typography.Text>
@@ -114,17 +131,18 @@ function App() {
                 {
                   isOptionsMode &&
                   state.options.map((option) => (
-                    <Button key={option.text} onClick={() => answer(option)} disabled={answerStatus} size={'large'}>
+                    <Button key={option.text} onClick={() => answer(option)} disabled={!!answerStatus} size={'large'}>
                       {option.text}
                     </Button>
                   ))
                 }
                 {
                   !isOptionsMode &&
-                  <Form onFinish={handleManualAnswer} autoComplete={'off'} disabled={answerStatus} size={'large'}>
+                  <Form initialValues={{answer: ''}} onFinish={handleManualAnswer} autoComplete={'off'}
+                        disabled={!!answerStatus} size={'large'}>
                     <Form.Item name={'answer'} rules={[{required: true, message: 'Please input your answer!'}]}>
                       <Space.Compact style={{width: '100%'}}>
-                        <Input placeholder={'Answer here'}/>
+                        <Input autoFocus placeholder={'Answer here'}/>
                         <Button type={'primary'} htmlType={'submit'}>
                           Submit
                         </Button>
