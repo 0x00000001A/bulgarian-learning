@@ -48,7 +48,7 @@ class AlphabetQuiz {
     this.next(undefined, true)
   }
   
-  next(answerText = '', isCleanRun = true) {
+  next(answerText = '', isCleanRun = false) {
     if (this.currentQuestion) {
       if (this.isCorrect(answerText)) {
         this.currentQuestion.addScore()
