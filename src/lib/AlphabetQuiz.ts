@@ -12,17 +12,17 @@ class AlphabetQuiz {
   currentGroup: AlphabetLetterGroup
   currentQuestion: AlphabetLetter
   currentDatabase: PriorityQueue<AlphabetLetterGroup>
-  
+
   MIN_SCORE_TO_REMEMBER: number
   MIN_SCORE_TO_ACCEPT_PROGRESS: number
-  
+
   constructor() {
     this.modes = 2
     this.currentMode = 0
-    
+
     this.MIN_SCORE_TO_REMEMBER = 1
     this.MIN_SCORE_TO_ACCEPT_PROGRESS = 2
-    
+
     const dummyAlphabet: AlphabetObject = {
       name: '',
       groups: [{
@@ -36,18 +36,18 @@ class AlphabetQuiz {
         }]
       }]
     }
-    
+
     this.alphabet = new Alphabet(dummyAlphabet)
     this.currentGroup = this.alphabet.groups[0]
     this.currentQuestion = this.currentGroup.letters[0]
     this.currentDatabase = new PriorityQueue<AlphabetLetterGroup>()
   }
-  
+
   start(alphabet: AlphabetObject) {
     this.initQuestions(alphabet)
     this.next(undefined, true)
   }
-  
+
   next(answerText = '', isCleanRun = false) {
     if (this.currentQuestion) {
       if (this.isCorrect(answerText)) {
@@ -56,29 +56,29 @@ class AlphabetQuiz {
         this.currentQuestion.reduceScore()
       }
     }
-    
+
     this.changeGroup(isCleanRun)
     this.changeQuestion()
     this.changeMode()
   }
-  
+
   isCorrect(answer: string) {
     const letter = this.currentQuestion.letter.toLowerCase()
     const description = this.currentQuestion.description.toLowerCase()
     const answerFixed = answer.trim().toLowerCase()
-    
+
     return letter === answerFixed || description === answerFixed
   }
-  
+
   getUniqueId() {
     const dateString = Date.now().toString(36)
     const randomness = Math.random().toString(36).substring(2)
     return dateString + randomness
   }
-  
+
   getOptions(): QuizOption[] {
     const options: QuizOption[] = []
-    
+
     // If current mode is 'letter-and-options' or 'description-and-options'
     if (this.currentMode < QuizModes.BIDERECTIONAL_QUESTIONS_WITH_MANUAL_INPUT) {
       this.currentGroup.letters.forEach((letter) => {
@@ -86,20 +86,20 @@ class AlphabetQuiz {
           id: this.getUniqueId(),
           text: letter.letter
         }
-        
+
         if (this.currentMode === 0) {
           option.text = letter.description
         }
-        
+
         options.push(option)
       })
     }
-    
+
     shuffleArray(options)
-    
+
     return options
   }
-  
+
   getQuestion(): QuizQuestion {
     const question = {
       text: '',
@@ -110,7 +110,7 @@ class AlphabetQuiz {
       progress: this.getProgress(),
       remembered: this.answerPossiblyRemembered()
     }
-    
+
     switch (this.currentMode) {
       case 0: // Letter with options
       case 2: // Letter and free-type answer
@@ -124,29 +124,29 @@ class AlphabetQuiz {
       default:
       // unknown mode;
     }
-    
+
     return question
   }
-  
+
   getProgress() {
     let total = 0
     let progress = 0
-    
+
     this.alphabet.groups.forEach((group) => {
       group.letters.forEach((letter) => {
         if (letter.score > this.MIN_SCORE_TO_ACCEPT_PROGRESS) {
           progress++
         }
-        
+
         total++
       })
     })
-    
+
     const percentage = progress / total * 100
-    
+
     return isNaN(percentage) ? 0 : percentage
   }
-  
+
   getSnapshot(): QuizSnapshot {
     return {
       mode: this.currentMode,
@@ -158,21 +158,21 @@ class AlphabetQuiz {
       minScoreToAcceptProgress: this.MIN_SCORE_TO_ACCEPT_PROGRESS
     }
   }
-  
+
   useSnapshot(snapshot: QuizSnapshot) {
     this.initQuestions(snapshot.alphabet)
-    
+
     for (let i = 1; i < snapshot.database; i++) {
       this.currentDatabase.push(this.alphabet.getGroup(i))
     }
-    
+
     this.currentMode = snapshot.mode
     this.currentGroup = this.alphabet.getGroup(snapshot.group)
     this.currentQuestion = this.currentGroup.letters[snapshot.question]
     this.MIN_SCORE_TO_REMEMBER = snapshot.minScoreToRemember
     this.MIN_SCORE_TO_ACCEPT_PROGRESS = snapshot.minScoreToAcceptProgress
   }
-  
+
   initQuestions(alphabet: AlphabetObject) {
     this.alphabet = new Alphabet(alphabet)
     this.currentGroup = this.alphabet.groups[0]
@@ -182,23 +182,23 @@ class AlphabetQuiz {
       let bScore = 0
       const aSize = groupA.lettersCount
       const bSize = groupB.lettersCount
-      
+
       const size = Math.min(aSize, bSize)
-      
+
       for (let i = 0; i < size; i++) {
         aScore += groupA.letters[i].score
         bScore += groupB.letters[i].score
       }
-      
+
       return aScore < bScore
     })
-    
+
     this.currentDatabase.push(this.alphabet.getGroup(0))
   }
-  
+
   changeMode() {
     if (this.currentQuestion && this.answerPossiblyRemembered()) {
-      if (this.currentMode === QuizModes.BIDERECTIONAL_QUESTIONS_WITH_MANUAL_INPUT) {
+      if (!this.currentQuestion.manual && this.currentMode === QuizModes.BIDERECTIONAL_QUESTIONS_WITH_MANUAL_INPUT) {
         this.currentMode = QuizModes.ONEDIRECTIONAL_QUESTIONS
       } else {
         this.currentMode = getRandomUpTo(this.modes + 1)
@@ -207,61 +207,61 @@ class AlphabetQuiz {
       this.currentMode = QuizModes.ONEDIRECTIONAL_QUESTIONS
     }
   }
-  
+
   changeGroup(isCleanRun = false) {
     if (!isCleanRun && this.currentGroup) {
       this.currentDatabase.push(this.currentGroup)
     }
-    
+
     let lowestScoreGroup
     const groups = []
     const x = 2
-    
+
     for (let i = 0; i < x; i++) {
       const groupWithLowestScore = this.currentDatabase.shift()
-      
+
       if (groupWithLowestScore) {
         groups.push(groupWithLowestScore)
       }
-      
+
       if (!lowestScoreGroup) {
         lowestScoreGroup = groupWithLowestScore
       }
     }
-    
+
     shuffleArray(groups)
-    
+
     this.currentGroup = groups.shift() || this.currentGroup
-    
+
     const restGroupsSize = groups.length
-    
+
     for (let xi = 0; xi < restGroupsSize; xi++) {
       this.currentDatabase.push(groups[xi])
     }
-    
+
     if (lowestScoreGroup) {
       this.increaseDifficultyIfNeeded(lowestScoreGroup)
     }
   }
-  
+
   changeQuestion() {
     this.currentQuestion = this.currentGroup.letters[getRandomUpTo(this.currentGroup.lettersCount)]
   }
-  
+
   increaseDifficultyIfNeeded(groupWithLowestScore: AlphabetLetterGroup) {
     const haveLettersToBeLearned = groupWithLowestScore.letters.some((letter) => {
       return letter.score < this.MIN_SCORE_TO_REMEMBER
     })
-    
+
     if (!haveLettersToBeLearned) {
       const nextGroup = this.alphabet.getGroup(this.currentDatabase.size)
-      
+
       if (nextGroup) {
         this.currentDatabase.push(nextGroup)
       }
     }
   }
-  
+
   answerPossiblyRemembered() {
     return this.currentQuestion.score > this.MIN_SCORE_TO_REMEMBER
   }
