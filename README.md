@@ -12,6 +12,7 @@ It automatically saves your progress to the local storage.
 ## Run and Deploy
 - Clone the repository
 - Fill the "homepage" property (ex.: `https://GH_PROFILE_NAME.github.io/PROJECT_REPO_NAME`)
+- Update the `base` property in the `vite.config.ts` in the root of the project
 - `npm run deploy`
 - Open the link from the "homepage" property in your browser 
 
