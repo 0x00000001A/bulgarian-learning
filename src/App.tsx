@@ -1,8 +1,9 @@
-import {ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState} from 'react'
+import {ChangeEvent, FormEvent, useCallback, useEffect, useState} from 'react'
 import Quiz from './lib/AlphabetQuiz'
 
 import bulgarian from './data.json'
 import {QuizOption, QuizQuestion} from './lib/types.ts'
+import AppToggleButton from "./components/AppToggleButton.tsx";
 
 const quiz = new Quiz()
 
@@ -14,10 +15,6 @@ const ANSWER_STATUSES = {
 
 type AppQuizOption = QuizOption & {
   selected: boolean
-}
-
-function clsx(...classList: unknown[]) {
-  return classList.filter(Boolean).join(' ')
 }
 
 function App() {
@@ -114,16 +111,33 @@ function App() {
     setShowHint(!showHint)
   }, [showHint])
 
-  const isOptionsMode = useMemo(() => {
-    return !!question.options.length
-  }, [question])
-
   const resetProgress = useCallback(() => {
     if (confirm('Sure?')) {
       localStorage.removeItem('al-bulgarian')
       window.location.reload()
     }
   }, [])
+
+  const renderOptionsItem = useCallback((option: AppQuizOption) => {
+    return (
+      <AppToggleButton
+        key={option.id}
+        label={option.text}
+        value={option.text}
+        selected={option.selected}
+        disabled={!!answerStatus}
+        onClick={answer}
+      />
+    )
+  }, [answer, answerStatus])
+
+  const renderOptions = useCallback(() => {
+    if (question.answerType === 'select') {
+      return options.map(renderOptionsItem)
+    }
+
+    return null
+  }, [options, question.answerType, renderOptionsItem])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(loadLanguages, [])
@@ -139,7 +153,20 @@ function App() {
       </div>
       <span className={'quizTextSmall quizTextSecondary quizTextCenter'}>
         <span className={'quizTextBold'}>Раздел: {question.group}</span> <br/>
-        {question.optionsToSelect > 1 ? `Выберите все (${question.optionsToSelect}) правильные варианты` : 'Выберите единственнный правильный ответ'}
+        {
+          question.answerType === 'select' &&
+          question.optionsToSelect > 1 &&
+          `Выберите все (${question.optionsToSelect}) правильные варианты`
+        }
+        {
+          question.answerType === 'select' &&
+          question.optionsToSelect === 1 &&
+          'Выберите единственнный правильный ответ'
+        }
+        {
+          question.answerType === 'text' &&
+          'Введите ответ в текстовое поле'
+        }
       </span>
       <span className={'quizQuestion'}>
         {question.text}
@@ -171,21 +198,9 @@ function App() {
         }
       </div>
       <div className={'quizOptions'}>
+        {renderOptions()}
         {
-          isOptionsMode &&
-          options.map((option) => (
-            <button
-              key={option.id}
-              className={clsx('quizButton', option.selected && 'quizButtonSelected')}
-              onClick={() => answer(option.text)}
-              disabled={!!answerStatus}
-            >
-              {option.text}
-            </button>
-          ))
-        }
-        {
-          !isOptionsMode &&
+          question.answerType === 'text' &&
           <form className={'quizForm'} onSubmit={handleManualAnswer} autoComplete={'off'}>
             <input
               onChange={handleTextAnswerChange}

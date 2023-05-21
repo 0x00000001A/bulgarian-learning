@@ -4,7 +4,25 @@
     {
       "description": "Местоимения",
       "letters": [
-        {"letter": "аз", "description": ["я"]}
+        {"letter": "аз", "description": ["я"]},
+        {"letter": "ти", "description": ["ты"]},
+        {"letter": "той", "description": ["он"]},
+        {"letter": "тя", "description": ["она"]},
+        {"letter": "то", "description": ["оно"]},
+        {"letter": "ние", "description": ["мы"]},
+        {"letter": "вие", "description": ["вы"]},
+        {"letter": "те", "description": ["они"]}
+      ]
+    },
+    {
+      "description": "Глагол-связка съм (есть)",
+      "letters": [
+        {"letter": "е", "description": ["той", "тя", "то"]},
+        {"letter": "са", "description": ["те"]},
+        {"letter": "си", "description": ["ти"]},
+        {"letter": "сте", "description": ["вие"]},
+        {"letter": "съм", "description": ["аз"]},
+        {"letter": "сме", "description": ["ние"]}
       ]
     }
   ]
