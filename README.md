@@ -24,8 +24,8 @@ It automatically saves your progress to the local storage.
   "groups": [
     {
       "description": "GROUP_DESCRIPTION",
-      "letters": [
-        {"letter": "LANG_NAME_LETTER_OR_WORD", "description": ["TRANSLATION"]},
+      "questions": [
+        {"text": "LANG_NAME_LETTER_OR_WORD", "answers": ["TRANSLATION"]},
         ...
       ]
     },
@@ -42,9 +42,9 @@ Examples:
   "groups": [
     {
       "description": "Alphabet",
-      "letters": [
-        {"letter": "あ", "description": ["a"]},
-        {"letter": "い", "description": ["i"]},
+      "questions": [
+        {"text": "あ", "answers": ["a"]},
+        {"text": "い", "answers": ["i"]},
         ...
       ]
     },
@@ -60,9 +60,9 @@ Examples:
   "groups": [
     {
       "description": "Words",
-      "letters": [
-        {"letter": "きんぎょ", "description": ["Goldfish", "Something"]},
-        {"letter": "たばこ", "description": ["Tobacco"]},
+      "questions": [
+        {"text": "きんぎょ", "answers": ["Goldfish", "Something"]},
+        {"text": "たばこ", "answers": ["Tobacco"]},
         ...
       ]
     },
