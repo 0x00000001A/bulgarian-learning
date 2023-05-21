@@ -1,5 +1,5 @@
 import {ChangeEvent, FormEvent, useCallback, useEffect, useState} from 'react'
-import Quiz from './lib/AlphabetQuiz'
+import Quiz from './lib/Quiz.ts'
 
 import bulgarian from './data.json'
 import {QuizOption, QuizQuestion} from './lib/types.ts'
@@ -26,7 +26,7 @@ function App() {
   const [question, setQuestion] = useState<QuizQuestion>({
     progress: 0,
     answerType: 'select',
-    questionSource: 'description',
+    questionSource: 'answers',
     optionsToSelect: 1,
     options: [],
     hint: '',

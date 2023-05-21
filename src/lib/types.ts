@@ -1,24 +1,24 @@
-export type AlphabetLetterJSON = {
-  letter: string
-  description: string[]
+export type QuizDataQuestionJSON = {
+  text: string
+  answers: string[]
 }
 
-export type AlphabetLetterObject = AlphabetLetterJSON & {
+export type QuizDataQuestionObject = QuizDataQuestionJSON & {
   score?: number
   manual?: boolean
 }
 
-export type AlphabetGroupObject = {
+export type QuizDataGroupObject = {
   description: string
-  letters: AlphabetLetterObject[]
+  questions: QuizDataQuestionObject[]
 }
 
-export type AlphabetObject = {
+export type QuizDataObject = {
   name: string
-  groups: AlphabetGroupObject[]
+  groups: QuizDataGroupObject[]
 }
 
-export type QuizQuestionSource = keyof AlphabetLetterJSON
+export type QuizQuestionSource = keyof QuizDataQuestionJSON
 
 export type QuizAnswerType = 'text' | 'select'
 
@@ -44,7 +44,7 @@ export type QuizSnapshot = {
   answerType: QuizAnswerType
   questionSource: QuizQuestionSource
   group: number
-  alphabet: AlphabetObject
+  alphabet: QuizDataObject
   question: number
   database: number
   minScoreToRemember: number

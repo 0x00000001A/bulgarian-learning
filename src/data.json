@@ -3,26 +3,26 @@
   "groups": [
     {
       "description": "Местоимения",
-      "letters": [
-        {"letter": "аз", "description": ["я"]},
-        {"letter": "ти", "description": ["ты"]},
-        {"letter": "той", "description": ["он"]},
-        {"letter": "тя", "description": ["она"]},
-        {"letter": "то", "description": ["оно"]},
-        {"letter": "ние", "description": ["мы"]},
-        {"letter": "вие", "description": ["вы"]},
-        {"letter": "те", "description": ["они"]}
+      "questions": [
+        {"text": "аз", "answers": ["я"]},
+        {"text": "ти", "answers": ["ты"]},
+        {"text": "той", "answers": ["он"]},
+        {"text": "тя", "answers": ["она"]},
+        {"text": "то", "answers": ["оно"]},
+        {"text": "ние", "answers": ["мы"]},
+        {"text": "вие", "answers": ["вы"]},
+        {"text": "те", "answers": ["они"]}
       ]
     },
     {
       "description": "Глагол-связка съм (есть)",
-      "letters": [
-        {"letter": "е", "description": ["той", "тя", "то"]},
-        {"letter": "са", "description": ["те"]},
-        {"letter": "си", "description": ["ти"]},
-        {"letter": "сте", "description": ["вие"]},
-        {"letter": "съм", "description": ["аз"]},
-        {"letter": "сме", "description": ["ние"]}
+      "questions": [
+        {"text": "е", "answers": ["той", "тя", "то"]},
+        {"text": "са", "answers": ["те"]},
+        {"text": "си", "answers": ["ти"]},
+        {"text": "сте", "answers": ["вие"]},
+        {"text": "съм", "answers": ["аз"]},
+        {"text": "сме", "answers": ["ние"]}
       ]
     }
   ]
