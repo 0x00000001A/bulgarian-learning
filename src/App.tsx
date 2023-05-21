@@ -189,6 +189,7 @@ function App() {
           <form className={'quizForm'} onSubmit={handleManualAnswer} autoComplete={'off'}>
             <input
               onChange={handleTextAnswerChange}
+              value={textAnswer}
               className={'quizInputText'}
               type={'text'}
               placeholder={'Answer here'}
