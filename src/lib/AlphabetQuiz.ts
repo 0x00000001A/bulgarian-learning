@@ -1,25 +1,28 @@
-import {AlphabetObject, QuizModes, QuizOption, QuizQuestion, QuizSnapshot} from './types.ts'
+import {
+  AlphabetObject,
+  QuizAnswerType,
+  QuizOption,
+  QuizQuestion,
+  QuizQuestionSource,
+  QuizSnapshot
+} from './types.ts'
 import Alphabet from './Alphabet.ts'
 import AlphabetLetterGroup from './AlphabetLetterGroup.ts'
 import {getRandomUpTo, shuffleArray} from './utils.ts'
-import AlphabetLetter from './AlphabetLetter.ts'
 import PriorityQueue from './PriorityQueue.ts'
+import AlphabetLetter from "./AlphabetLetter.ts";
 
 class AlphabetQuiz {
-  modes: QuizModes
   alphabet: Alphabet
-  currentMode: QuizModes
   currentGroup: AlphabetLetterGroup
-  currentQuestion: AlphabetLetter
+  currentQuestion: QuizQuestion
   currentDatabase: PriorityQueue<AlphabetLetterGroup>
+  currentQuestionLetter: AlphabetLetter
 
   MIN_SCORE_TO_REMEMBER: number
   MIN_SCORE_TO_ACCEPT_PROGRESS: number
 
   constructor() {
-    this.modes = 2
-    this.currentMode = 0
-
     this.MIN_SCORE_TO_REMEMBER = 1
     this.MIN_SCORE_TO_ACCEPT_PROGRESS = 2
 
@@ -29,18 +32,17 @@ class AlphabetQuiz {
         description: '',
         letters: [{
           letter: '',
-          description: '',
-          manual: false,
+          description: [],
           score: 0,
-          sentence: ''
         }]
       }]
     }
 
     this.alphabet = new Alphabet(dummyAlphabet)
     this.currentGroup = this.alphabet.groups[0]
-    this.currentQuestion = this.currentGroup.letters[0]
+    this.currentQuestion = this.buildQuestion()
     this.currentDatabase = new PriorityQueue<AlphabetLetterGroup>()
+    this.currentQuestionLetter = this.currentGroup.letters[0]
   }
 
   start(alphabet: AlphabetObject) {
@@ -48,24 +50,23 @@ class AlphabetQuiz {
     this.next(undefined, true)
   }
 
-  next(answerText = '', isCleanRun = false) {
+  next(answerText: string[] = [], isCleanRun = false) {
     if (this.currentQuestion) {
       if (this.isCorrect(answerText)) {
-        this.currentQuestion.addScore()
+        this.currentQuestionLetter.addScore()
       } else {
-        this.currentQuestion.reduceScore()
+        this.currentQuestionLetter.reduceScore()
       }
     }
 
     this.changeGroup(isCleanRun)
-    this.changeQuestion()
-    this.changeMode()
+    this.buildQuestion()
   }
 
-  isCorrect(answer: string) {
-    const letter = this.currentQuestion.letter.toLowerCase()
-    const description = this.currentQuestion.description.toLowerCase()
-    const answerFixed = answer.trim().toLowerCase()
+  isCorrect(answer: string[]) {
+    const letter = this.currentQuestionLetter.letter.toLowerCase()
+    const description = this.currentQuestionLetter.description.sort().join(', ').toLowerCase()
+    const answerFixed = answer.sort().join(', ').trim().toLowerCase()
 
     return letter === answerFixed || description === answerFixed
   }
@@ -74,58 +75,6 @@ class AlphabetQuiz {
     const dateString = Date.now().toString(36)
     const randomness = Math.random().toString(36).substring(2)
     return dateString + randomness
-  }
-
-  getOptions(): QuizOption[] {
-    const options: QuizOption[] = []
-
-    // If current mode is 'letter-and-options' or 'description-and-options'
-    if (this.currentMode < QuizModes.BIDERECTIONAL_QUESTIONS_WITH_MANUAL_INPUT) {
-      this.currentGroup.letters.forEach((letter) => {
-        const option: QuizOption = {
-          id: this.getUniqueId(),
-          text: letter.letter
-        }
-
-        if (this.currentMode === 0) {
-          option.text = letter.description
-        }
-
-        options.push(option)
-      })
-    }
-
-    shuffleArray(options)
-
-    return options
-  }
-
-  getQuestion(): QuizQuestion {
-    const question = {
-      text: '',
-      hint: '',
-      group: this.currentGroup.description,
-      score: this.currentQuestion.score,
-      options: this.getOptions(),
-      progress: this.getProgress(),
-      remembered: this.answerPossiblyRemembered()
-    }
-
-    switch (this.currentMode) {
-      case 0: // Letter with options
-      case 2: // Letter and free-type answer
-        question.text = this.currentQuestion.letter
-        question.hint = this.currentQuestion.description
-        break
-      case 1: // Description with options
-        question.text = this.currentQuestion.description
-        question.hint = this.currentQuestion.letter
-        break
-      default:
-      // unknown mode;
-    }
-
-    return question
   }
 
   getProgress() {
@@ -149,11 +98,12 @@ class AlphabetQuiz {
 
   getSnapshot(): QuizSnapshot {
     return {
-      mode: this.currentMode,
       group: this.currentGroup.id,
       alphabet: this.alphabet.toObject(),
-      question: this.currentQuestion.id,
+      question: this.currentQuestionLetter.id,
       database: this.currentDatabase.size,
+      answerType: this.currentQuestion.answerType,
+      questionSource: this.currentQuestion.questionSource,
       minScoreToRemember: this.MIN_SCORE_TO_REMEMBER,
       minScoreToAcceptProgress: this.MIN_SCORE_TO_ACCEPT_PROGRESS
     }
@@ -166,9 +116,8 @@ class AlphabetQuiz {
       this.currentDatabase.push(this.alphabet.getGroup(i))
     }
 
-    this.currentMode = snapshot.mode
     this.currentGroup = this.alphabet.getGroup(snapshot.group)
-    this.currentQuestion = this.currentGroup.letters[snapshot.question]
+    this.currentQuestion = this.buildQuestion(snapshot)
     this.MIN_SCORE_TO_REMEMBER = snapshot.minScoreToRemember
     this.MIN_SCORE_TO_ACCEPT_PROGRESS = snapshot.minScoreToAcceptProgress
   }
@@ -194,18 +143,6 @@ class AlphabetQuiz {
     })
 
     this.currentDatabase.push(this.alphabet.getGroup(0))
-  }
-
-  changeMode() {
-    if (this.currentQuestion && this.answerPossiblyRemembered()) {
-      if (!this.currentQuestion.manual && this.currentMode === QuizModes.BIDERECTIONAL_QUESTIONS_WITH_MANUAL_INPUT) {
-        this.currentMode = QuizModes.ONEDIRECTIONAL_QUESTIONS
-      } else {
-        this.currentMode = getRandomUpTo(this.modes + 1)
-      }
-    } else {
-      this.currentMode = QuizModes.ONEDIRECTIONAL_QUESTIONS
-    }
   }
 
   changeGroup(isCleanRun = false) {
@@ -244,8 +181,88 @@ class AlphabetQuiz {
     }
   }
 
-  changeQuestion() {
-    this.currentQuestion = this.currentGroup.letters[getRandomUpTo(this.currentGroup.lettersCount)]
+  buildQuestion(snapshot?: QuizSnapshot): QuizQuestion {
+    this.currentQuestionLetter = this.currentGroup.letters[getRandomUpTo(this.currentGroup.lettersCount)]
+
+    if (snapshot?.question) {
+      this.currentQuestionLetter = this.currentGroup.letters[snapshot.question]
+    }
+
+    const nextQuestionAnswerTypes: QuizAnswerType[] = ['text', 'select']
+    const nextQuestionSources: QuizQuestionSource[] = ['letter', 'description']
+    const question: QuizQuestion = {
+      hint: '',
+      text: '',
+      group: this.currentGroup.description,
+      score: this.currentQuestionLetter.score,
+      options: [],
+      progress: this.getProgress(),
+      remembered: this.questionIsPossiblyRemembered(this.currentQuestionLetter),
+      answerType: 'select',
+      questionSource: 'letter',
+      optionsToSelect: 1,
+    }
+
+    if (!snapshot) {
+      if (question.remembered) {
+        question.questionSource = nextQuestionSources[Math.round(Math.random())]
+        question.answerType = nextQuestionAnswerTypes[Math.round(Math.random())]
+      }
+
+      // if question source is letter and there is more than one options to select
+      // then do not allow manual user input
+      if (question.questionSource === 'letter' && this.currentQuestionLetter.description.length > 1) {
+        question.answerType = 'select'
+      }
+    } else {
+      question.answerType = snapshot.answerType
+      question.questionSource = snapshot.questionSource
+    }
+
+    if (question.questionSource === 'letter') {
+      question.text = this.currentQuestionLetter.letter
+      question.hint = this.currentQuestionLetter.description.join(', ')
+      question.optionsToSelect = this.currentQuestionLetter.description.length
+    }
+
+    if (question.questionSource === 'description') {
+      question.text = this.currentQuestionLetter.description.join(', ')
+      question.hint = this.currentQuestionLetter.letter
+    }
+
+    question.options = this.buildOptions(question.questionSource, question.answerType)
+
+    this.currentQuestion = question
+
+    return question
+  }
+
+  buildOptions(questionSource: QuizQuestionSource, answerType: QuizAnswerType): QuizOption[] {
+    const options: QuizOption[] = []
+
+    if (answerType === 'select') {
+      this.currentGroup.letters.forEach((lettersItem) => {
+        if (questionSource === 'description') {
+          const option: QuizOption = {
+            id: this.getUniqueId(),
+            text: lettersItem.letter
+          }
+
+          options.push(option)
+        }
+
+        if (questionSource === 'letter') {
+          options.push(...lettersItem.description.map((description: string) => ({
+            id: this.getUniqueId(),
+            text: description
+          })))
+        }
+      })
+    }
+
+    shuffleArray(options)
+
+    return options
   }
 
   increaseDifficultyIfNeeded(groupWithLowestScore: AlphabetLetterGroup) {
@@ -262,8 +279,8 @@ class AlphabetQuiz {
     }
   }
 
-  answerPossiblyRemembered() {
-    return this.currentQuestion.score > this.MIN_SCORE_TO_REMEMBER
+  questionIsPossiblyRemembered(letter: AlphabetLetter) {
+    return Number(letter.score) > this.MIN_SCORE_TO_REMEMBER
   }
 }
 

@@ -1,8 +1,8 @@
 import {ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState} from 'react'
 import Quiz from './lib/AlphabetQuiz'
 
-import bulgarian from './bulgrarian.json'
-import {QuizQuestion} from './lib/types.ts'
+import bulgarian from './data.json'
+import {QuizOption, QuizQuestion} from './lib/types.ts'
 
 const quiz = new Quiz()
 
@@ -12,83 +12,135 @@ const ANSWER_STATUSES = {
   SUCC: 2
 }
 
+type AppQuizOption = QuizOption & {
+  selected: boolean
+}
+
+function clsx(...classList: unknown[]) {
+  return classList.filter(Boolean).join(' ')
+}
+
 function App() {
+  const [options, setOptions] = useState<AppQuizOption[]>([])
   const [showHint, setShowHint] = useState(false)
   const [textAnswer, setTextAnswer] = useState('')
   const [answerStatus, setAnswerStatus] = useState(ANSWER_STATUSES.NONE)
-  
+
   const [question, setQuestion] = useState<QuizQuestion>({
-    text: '',
-    hint: '',
-    group: '',
-    score: 0,
-    options: [],
     progress: 0,
-    remembered: false
+    answerType: 'select',
+    questionSource: 'description',
+    optionsToSelect: 1,
+    options: [],
+    hint: '',
+    text: '',
+    remembered: false,
+    score: 0,
+    group: ''
   })
-  
+
+  const handleNextQuestion = useCallback(() => {
+    const question = quiz.currentQuestion
+    setQuestion(question)
+
+    localStorage.setItem('al-bulgarian', JSON.stringify(quiz.getSnapshot()))
+    setAnswerStatus(ANSWER_STATUSES.NONE)
+    setTextAnswer('')
+    setShowHint(false)
+    setOptions(question.options.map((option) => ({
+      ...option,
+      selected: false
+    })))
+  }, [])
+
   const loadLanguages = useCallback(() => {
     const stored = localStorage.getItem('al-bulgarian')
-    
+
     if (stored) {
       quiz.useSnapshot(JSON.parse(stored))
     } else {
       quiz.start(bulgarian)
     }
-    
-    setQuestion(quiz.getQuestion())
-  }, [])
-  
-  const answer = useCallback((option: string) => {
-    if (!quiz.isCorrect(option)) {
-      setAnswerStatus(ANSWER_STATUSES.FAIL)
-    } else {
-      setAnswerStatus(ANSWER_STATUSES.SUCC)
+
+    handleNextQuestion()
+  }, [handleNextQuestion])
+
+  const handleOptionSelection = useCallback((answerText: string) => {
+    const updatedOptions = options.map((optionsItem) => ({
+      ...optionsItem,
+      selected: optionsItem.text === answerText ? !optionsItem.selected : optionsItem.selected
+    }))
+
+    setOptions(updatedOptions)
+
+    return updatedOptions
+  }, [options])
+
+  const answer = useCallback((answerText: string) => {
+    let answer = [answerText]
+    let isCorrectAnswer = quiz.isCorrect(answer)
+
+    if (question.answerType === 'select') {
+      const options = handleOptionSelection(answerText)
+      answer = options.filter((option) => {
+        return option.selected
+      }).map((option) => {
+        return option.text
+      })
+
+      isCorrectAnswer = quiz.isCorrect(answer)
     }
-    
-    setTimeout(() => {
-      setTextAnswer('')
-      setShowHint(false)
-      quiz.next(option)
-      setQuestion(quiz.getQuestion())
-      localStorage.setItem('al-bulgarian', JSON.stringify(quiz.getSnapshot()))
-      setAnswerStatus(ANSWER_STATUSES.NONE)
-    }, 1000)
-  }, [])
-  
+
+    if (question.optionsToSelect === answer.length) {
+      setAnswerStatus(isCorrectAnswer ? ANSWER_STATUSES.SUCC : ANSWER_STATUSES.FAIL)
+
+      setTimeout(() => {
+        quiz.next(answer)
+        handleNextQuestion()
+      }, 1000)
+    }
+  }, [handleNextQuestion, handleOptionSelection, question.answerType, question.optionsToSelect])
+
   const handleManualAnswer = useCallback((event: FormEvent) => {
     event.preventDefault()
     answer(textAnswer.trim().toLowerCase())
   }, [answer, textAnswer])
-  
+
   const handleTextAnswerChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setTextAnswer(event.target.value)
   }, [])
-  
+
   const toggleHint = useCallback(() => {
     setShowHint(!showHint)
   }, [showHint])
-  
+
   const isOptionsMode = useMemo(() => {
     return !!question.options.length
   }, [question])
-  
+
   const resetProgress = useCallback(() => {
     if (confirm('Sure?')) {
       localStorage.removeItem('al-bulgarian')
       window.location.reload()
     }
   }, [])
-  
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(loadLanguages, [])
-  
+
+  if (!question) {
+    return null
+  }
+
   return (
     <div className={'quizCard'}>
       <div className={'quizProgress'}>
         <div className={'quizProgressInner'} style={{width: `${question.progress}%`}}></div>
       </div>
-      <span className={'quizTextSmall quizTextSecondary'}>Раздел: {question.group}</span>
+      <span className={'quizTextSmall quizTextSecondary quizTextCenter'}>
+        <span className={'quizTextBold'}>Раздел: {question.group}</span> <br/>
+        {question.optionsToSelect > 1 ? `Выберите все (${question.optionsToSelect}) правильные варианты` : 'Выберите единственнный правильный ответ'}
+      </span>
       <span className={'quizQuestion'}>
         {question.text}
       </span>
@@ -121,10 +173,10 @@ function App() {
       <div className={'quizOptions'}>
         {
           isOptionsMode &&
-          question.options.map((option) => (
+          options.map((option) => (
             <button
               key={option.id}
-              className={'quizButton'}
+              className={clsx('quizButton', option.selected && 'quizButtonSelected')}
               onClick={() => answer(option.text)}
               disabled={!!answerStatus}
             >

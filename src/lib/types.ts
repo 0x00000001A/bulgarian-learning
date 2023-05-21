@@ -1,13 +1,15 @@
-export type AlphabetLetterObject = {
+export type AlphabetLetterJSON = {
   letter: string
-  description: string
+  description: string[]
+}
+
+export type AlphabetLetterObject = AlphabetLetterJSON & {
   score?: number
   manual?: boolean
-  sentence?: string
 }
 
 export type AlphabetGroupObject = {
-  description: string,
+  description: string
   letters: AlphabetLetterObject[]
 }
 
@@ -16,11 +18,9 @@ export type AlphabetObject = {
   groups: AlphabetGroupObject[]
 }
 
-export enum QuizModes {
-  ONEDIRECTIONAL_QUESTIONS,
-  BIDERECTIONAL_QUESTIONS,
-  BIDERECTIONAL_QUESTIONS_WITH_MANUAL_INPUT
-}
+export type QuizQuestionSource = keyof AlphabetLetterJSON
+
+export type QuizAnswerType = 'text' | 'select'
 
 export type QuizOption = {
   id: string
@@ -30,19 +30,23 @@ export type QuizOption = {
 export type QuizQuestion = {
   text: string
   hint: string
-  group: string,
-  score: number,
+  group: string
+  score: number
   options: QuizOption[]
   progress: number
   remembered: boolean
+  answerType: QuizAnswerType
+  questionSource: QuizQuestionSource
+  optionsToSelect: number
 }
 
 export type QuizSnapshot = {
-  mode: QuizModes,
-  group: number,
-  alphabet: AlphabetObject,
-  question: number,
-  database: number,
-  minScoreToRemember: number,
+  answerType: QuizAnswerType
+  questionSource: QuizQuestionSource
+  group: number
+  alphabet: AlphabetObject
+  question: number
+  database: number
+  minScoreToRemember: number
   minScoreToAcceptProgress: number
 }
