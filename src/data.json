@@ -15,7 +15,7 @@
       ]
     },
     {
-      "description": "Артикли",
+      "description": "Глагол-связка съм (есть)",
       "letters": [
         {"letter": "е", "description": "той, тя, то", "manual": false},
         {"letter": "са", "description": "те", "manual": false},
